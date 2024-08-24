@@ -8,7 +8,6 @@ const ECard = () => {
 
   useEffect(() => {
     if (textareaRef.current) {
-      // Adjust the height of the textarea based on its content
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
@@ -65,7 +64,10 @@ const ECard = () => {
           onChange={handleTextChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
-          style={styles.textInput}
+          style={{
+            ...styles.textInput,
+            ...(isEditing ? styles.editingInput : styles.nonEditingInput),
+          }}
         />
       </div>
       <button onClick={handleCaptureClick} style={styles.button}>
@@ -125,11 +127,19 @@ const styles = {
     fontSize: '4vw',
     padding: '2vw',
     textAlign: 'center',
-    backgroundColor: 'transparent',  // Completely transparent background
-    color: 'black',  // Text color
-    border: 'none',  // Remove border
-    outline: 'none', // Remove the outline when focused
-    cursor: 'text',  // Indicate it can be edited
+    backgroundColor: 'transparent',
+    color: 'black',
+    border: 'none',
+    outline: 'none',
+    cursor: 'text',
+    resize: 'none',
+    overflow: 'hidden',
+  },
+  editingInput: {
+    borderBottom: '1px solid black', // Example: Show a border when editing
+  },
+  nonEditingInput: {
+    borderBottom: 'none', // No border when not editing
   },
   button: {
     width: '90vw',
