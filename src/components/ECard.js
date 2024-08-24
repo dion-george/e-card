@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 
 const ECard = () => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState('Happy weekend guys');
+  const [isEditing, setIsEditing] = useState(false);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      // Adjust the height of the textarea based on its content
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [text]);
 
   const handleTextChange = (event) => {
     setText(event.target.value);
   };
 
+  const handleInputFocus = () => {
+    setIsEditing(true);
+  };
+
+  const handleInputBlur = () => {
+    if (text.trim() === '') {
+      setText('Happy weekend guys');
+    }
+    setIsEditing(false);
+  };
 
   const handleCaptureClick = () => {
     const ecardElement = document.getElementById('ecard');
@@ -15,7 +35,7 @@ const ECard = () => {
       canvas.toBlob((blob) => {
         const file = new File([blob], 'ecard.png', { type: 'image/png' });
         const filesArray = [file];
-  
+
         if (navigator.share) {
           navigator
             .share({
@@ -27,29 +47,25 @@ const ECard = () => {
             .catch((error) => console.log('Sharing failed', error));
         } else {
           console.log('Web Share API is not supported in this browser.');
-
-          alert('Web Share API is not supported in this browser.')
-          // You could handle cases where the Web Share API is not supported,
-          // e.g., fall back to a different method or show an error message.
         }
       });
     });
   };
 
   return (
-    <div>
+    <div style={styles.wrapper}>
+      <header style={styles.header}>
+        <h1 style={styles.headerText}>E-Card</h1>
+      </header>
       <div style={styles.container} id="ecard">
-        <img
-          src="https://via.placeholder.com/300x200.png?text=Your+Image+Here"
-          alt="E-card background"
-          style={styles.image}
-        />
-        <input
-          type="text"
+        <img src="/balloons-2.png" alt="E-card background" style={styles.image} />
+        <textarea
+          ref={textareaRef}
           value={text}
           onChange={handleTextChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           style={styles.textInput}
-          placeholder="Your message here"
         />
       </div>
       <button onClick={handleCaptureClick} style={styles.button}>
@@ -60,35 +76,72 @@ const ECard = () => {
 };
 
 const styles = {
+  wrapper: {
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0',
+    boxSizing: 'border-box',
+  },
+  header: {
+    width: '100%',
+    height: '32px',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxSizing: 'border-box',
+  },
+  headerText: {
+    color: 'black',
+    fontSize: '16px',
+    margin: 0,
+    padding: 0,
+  },
   container: {
-    position: 'relative',
-    width: '300px',
-    height: '200px',
+    width: '85vw',
+    height: 'auto',
     textAlign: 'center',
+    margin: '24px 0',
+    position: 'relative',
+    flex: 1,
   },
   image: {
     width: '100%',
-    height: '100%',
-    objectFit: 'cover',
+    height: 'auto',
+    maxHeight: 'calc(100vh - 32px - 48px - 48px)', // Adjusted for header and button
+    objectFit: 'contain',
+    borderRadius: '10px',
   },
   textInput: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '80%',
-    fontSize: '18px',
-    padding: '5px',
+    width: '70%',
+    fontSize: '4vw',
+    padding: '2vw',
     textAlign: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional for readability
-    border: 'none',
-    borderRadius: '5px',
+    backgroundColor: 'transparent',  // Completely transparent background
+    color: 'black',  // Text color
+    border: 'none',  // Remove border
+    outline: 'none', // Remove the outline when focused
+    cursor: 'text',  // Indicate it can be edited
   },
   button: {
-    marginTop: '20px',
-    padding: '10px 20px',
-    fontSize: '16px',
+    width: '90vw',
+    padding: '1.5vh 0',
+    fontSize: '4vw',
     cursor: 'pointer',
+    borderRadius: '5px',
+    backgroundColor: '#fc8019',
+    color: 'white',
+    border: 'none',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    marginBottom: '16px',
   },
 };
 
